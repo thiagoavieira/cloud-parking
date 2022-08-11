@@ -1,6 +1,8 @@
 package one.innovation.digital.cloudparking.service;
 
+import one.innovation.digital.cloudparking.exception.ParkingNotFoundException;
 import one.innovation.digital.cloudparking.model.Parking;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -11,21 +13,17 @@ public class ParkingService {
 
     private static final Map<String, Parking> parkingMap = new HashMap<>();
 
-    static {
-        var id = getUUID();
-        var id1 = getUUID();
-        Parking parking = new Parking(id, "FUR-4321", "MG", "HB20", "BRANCO");
-        Parking parking1 = new Parking(id1, "TBK-1234", "SP", "VW GOL", "VERMELHO");
-        parkingMap.put(id, parking);
-        parkingMap.put(id1, parking1);
-    }
-
     public List<Parking> findAll(){
         return new ArrayList<>(parkingMap.values());
     }
 
     public Parking findById(String id){
-        return parkingMap.get(id);
+        Parking parking = parkingMap.get(id);
+        if(parking == null){
+            throw new ParkingNotFoundException(id);
+        }
+
+        return parking;
     }
 
     public Parking create(Parking parkingCreate){
@@ -37,7 +35,25 @@ public class ParkingService {
         return parkingCreate;
     }
 
+    public void delete(String id) {
+        findById(id);
+        parkingMap.remove(id);
+    }
+
+    public Parking update(String id, Parking parkingCreate) {
+        Parking parking = findById(id);
+        parking.setColor(parkingCreate.getColor());
+        parkingMap.replace(id, parking);
+
+        return parking;
+    }
+
     private static String getUUID() {
         return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    public Parking exit(String id) {
+        Parking parking = findById(id);
+        return null;
     }
 }
