@@ -1,6 +1,5 @@
 package one.innovation.digital.cloudparking.controller;
 
-import io.restassured.RestAssured;
 import one.innovation.digital.cloudparking.controller.dto.ParkingCreateDTO;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,29 +9,32 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import io.restassured.RestAssured;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ParkingControllerTest {
+class ParkingControllerTest extends AbstractContainerBase {
 
     @LocalServerPort
     private int randomPort;
 
     @BeforeEach
-    public void setUpTest(){
+    public void setUpTest() {
         RestAssured.port = randomPort;
     }
 
     @Test
-    void whenFindAllThenCheckResult(){
+    void whenFindAllThenCheckResult() {
         RestAssured.given()
+                .auth()
+                .basic("user", "12345")
                 .when()
                 .get("/parking")
                 .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("license[0]", Matchers.equalTo("FUR-4321"));
+                .statusCode(HttpStatus.OK.value());
     }
 
     @Test
-    void whenCreateThenCheckIsCreated(){
+    void whenCreateThenCheckIsCreated() {
         var createDTO = new ParkingCreateDTO();
         createDTO.setColor("AMARELO");
         createDTO.setLicense("WRT-5555");
@@ -41,13 +43,13 @@ public class ParkingControllerTest {
 
         RestAssured.given()
                 .when()
+                .auth().basic("user", "12345")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(createDTO)
                 .post("/parking")
                 .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .body("license[0]", Matchers.equalTo("WRT-5555"))
-                .body("color", Matchers.equalTo("AZUL"));
+                .body("license", Matchers.equalTo("WRT-5555"))
+                .body("color", Matchers.equalTo("AMARELO"));
     }
-
 }

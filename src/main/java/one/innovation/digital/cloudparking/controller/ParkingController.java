@@ -2,6 +2,7 @@ package one.innovation.digital.cloudparking.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+
 import one.innovation.digital.cloudparking.controller.dto.ParkingCreateDTO;
 import one.innovation.digital.cloudparking.controller.dto.ParkingDTO;
 import one.innovation.digital.cloudparking.controller.mapper.ParkingMapper;
@@ -10,7 +11,14 @@ import one.innovation.digital.cloudparking.service.ParkingService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -70,7 +78,7 @@ public class ParkingController {
 
     @PostMapping("/{id}")
     public ResponseEntity<ParkingDTO> exit(@PathVariable String id){
-        var parking = parkingService.exit(id);
+        Parking parking = parkingService.checkOut(id);
 
         return ResponseEntity.ok(parkingMapper.toParkingDTO(parking));
     }
